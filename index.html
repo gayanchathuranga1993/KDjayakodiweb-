@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ceylon ODC - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine.js"></script>
+    <style>
+        .hero-pattern {
+            background-color: #000000;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/api/placeholder/1920/1080');
+            background-size: cover;
+            background-position: center;
+        }
+        .package-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .admin-panel.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50" x-data="{ 
+    isAdminOpen: false,
+    isAuthenticated: false,
+    password: '',
+    images: {
+        hero: '/api/placeholder/1920/1080',
+        cultural: '/api/placeholder/400/300',
+        beach: '/api/placeholder/400/300',
+        wildlife: '/api/placeholder/400/300',
+        blog1: '/api/placeholder/600/400',
+        blog2: '/api/placeholder/600/400'
+    },
+    titles: {
+        hero: 'Discover Sri Lanka',
+        cultural: 'Cultural Heritage Tour',
+        beach: 'Tropical Beach Escape',
+        wildlife: 'Wildlife Safari Adventure',
+        blog1: '10 Must-Visit Places in Sri Lanka',
+        blog2: 'Sri Lankan Cuisine: A Food Lover\'s Guide'
+    },
+    descriptions: {
+        cultural: 'Explore ancient temples and historical sites across Sri Lanka.',
+        beach: 'Relax on pristine beaches and enjoy water sports.',
+        wildlife: 'Discover Sri Lanka\'s amazing wildlife in natural habitats.',
+        blog1: 'Discover the hidden gems and popular attractions that make Sri Lanka a unique destination.',
+        blog2: 'Explore the rich flavors and spices of traditional Sri Lankan dishes.'
+    },
+    prices: {
+        cultural: 599,
+        beach: 499,
+        wildlife: 699
+    },
+    authenticate() {
+        if (this.password === 'admin123') { // You should change this password
+            this.isAuthenticated = true;
+            this.isAdminOpen = true;
+        } else {
+            alert('Invalid password');
+        }
+    },
+    updateImage(key, event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.images[key] = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    },
+    saveChanges() {
+        // In a real implementation, you'd save to a backend
+        alert('Changes saved successfully!');
+    }
+}">
+
+    <!-- Admin Login Button -->
+    <button 
+        @click="isAdminOpen = true"
+        class="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        Admin Panel
+    </button>
+
+    <!-- Admin Panel -->
+    <div class="admin-panel" :class="{ 'active': isAdminOpen }">
+        <div class="p-6">
+            <!-- Login Form -->
+            <div x-show="!isAuthenticated" class="space-y-4">
+                <h2 class="text-2xl font-bold mb-4">Admin Login</h2>
+                <input 
+                    type="password" 
+                    x-model="password"
+                    placeholder="Enter password"
+                    class="w-full px-4 py-2 border rounded-lg"
+                >
+                <button 
+                    @click="authenticate()"
+                    class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg">
+                    Login
+                </button>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div x-show="isAuthenticated" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold">Dashboard</h2>
+                    <button 
+                        @click="isAdminOpen = false"
+                        class="text-gray-500 hover:text-gray-700">
+                        Close
+                    </button>
+                </div>
+
+                <!-- Image Management -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold">Image Management</h3>
+                    
+                    <!-- Hero Section -->
+                    <div class="border p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Hero Section</h4>
+                        <input 
+                            type="file" 
+                            @change="updateImage('hero', $event)"
+                            accept="image/*"
+                            class="mb-2"
+                        >
+                        <input 
+                            type="text" 
+                            x-model="titles.hero"
+                            class="w-full px-4 py-2 border rounded-lg"
+                            placeholder="Hero Title"
+                        >
+                    </div>
+
+                    <!-- Tour Packages -->
+                    <div class="border p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Tour Packages</h4>
+                        
+                        <!-- Cultural Tour -->
+                        <div class="mb-4">
+                            <h5 class="font-bold">Cultural Tour</h5>
+                            <input 
+                                type="file" 
+                                @change="updateImage('cultural', $event)"
+                                accept="image/*"
+                                class="mb-2"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="titles.cultural"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Title"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="descriptions.cultural"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Description"
+                            >
+                            <input 
+                                type="number" 
+                                x-model="prices.cultural"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="Price"
+                            >
+                        </div>
+
+                        <!-- Beach Tour -->
+                        <div class="mb-4">
+                            <h5 class="font-bold">Beach Tour</h5>
+                            <input 
+                                type="file" 
+                                @change="updateImage('beach', $event)"
+                                accept="image/*"
+                                class="mb-2"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="titles.beach"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Title"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="descriptions.beach"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Description"
+                            >
+                            <input 
+                                type="number" 
+                                x-model="prices.beach"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="Price"
+                            >
+                        </div>
+
+                        <!-- Wildlife Tour -->
+                        <div class="mb-4">
+                            <h5 class="font-bold">Wildlife Tour</h5>
+                            <input 
+                                type="file" 
+                                @change="updateImage('wildlife', $event)"
+                                accept="image/*"
+                                class="mb-2"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="titles.wildlife"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Title"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="descriptions.wildlife"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Description"
+                            >
+                            <input 
+                                type="number" 
+                                x-model="prices.wildlife"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="Price"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Blog Posts -->
+                    <div class="border p-4 rounded-lg">
+                        <h4 class="font-bold mb-2">Blog Posts</h4>
+                        
+                        <!-- Blog Post 1 -->
+                        <div class="mb-4">
+                            <h5 class="font-bold">Blog Post 1</h5>
+                            <input 
+                                type="file" 
+                                @change="updateImage('blog1', $event)"
+                                accept="image/*"
+                                class="mb-2"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="titles.blog1"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Title"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="descriptions.blog1"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="Description"
+                            >
+                        </div>
+
+                        <!-- Blog Post 2 -->
+                        <div class="mb-4">
+                            <h5 class="font-bold">Blog Post 2</h5>
+                            <input 
+                                type="file" 
+                                @change="updateImage('blog2', $event)"
+                                accept="image/*"
+                                class="mb-2"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="titles.blog2"
+                                class="w-full px-4 py-2 border rounded-lg mb-2"
+                                placeholder="Title"
+                            >
+                            <input 
+                                type="text" 
+                                x-model="descriptions.blog2"
+                                class="w-full px-4 py-2 border rounded-lg"
+                                placeholder="Description"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Save Changes Button -->
+                    <button 
+                        @click="saveChanges()"
+                        class="w-full bg-green-600 text-white px-4 py-2 rounded-lg">
+                        Save All Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Website Content (Previous HTML remains the same, but using x-bind for dynamic content) -->
+    <!-- Hero Section -->
+    <div class="hero-pattern h-screen flex items-center justify-center text-white" x-bind:style="{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${images.hero})` }">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4" x-text="titles.hero">Discover Sri Lanka</h1>
+            <p class="text-xl md:text-2xl mb-8">Your Next Adventure Awaits!</p>
+            <div class="flex justify-center space-x-4">
+                <input type="text" placeholder="Search destinations..." class="px-6 py-3 rounded-lg text-gray-800 w-64 md:w-96">
+                <button class="bg-blue-600 px-6 py-3 rounded-lg hover:bg-blue-700">Search</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest of the website content remains the same, but using x-bind and x-text for dynamic content -->
+    <!-- ... -->
+
+</body>
+</html>
